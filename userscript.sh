@@ -39,7 +39,6 @@ done
 
 # Check for users that shouldnt have admin
 for USER in "${ALL_USERS[@]}"; do
-    deluser $USER admin
     if [[ ${ADMIN_USERS[@]} =~ $USER ]]
     then
         if groups "$USER" | grep -q '\bsudo\b'; then
