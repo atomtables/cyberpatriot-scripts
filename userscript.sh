@@ -31,7 +31,7 @@ ALL_USERS=($(cat /etc/passwd | grep '/home' | cut -d: -f1))
 # Check for unexpected users
 for USER in "${ALL_USERS[@]}"; do
     if [[ ! " ${EXPECTED_USERS[@]} " =~ " ${USER} " ]]; then
-        echo "User '${USER}' is not in the expected list."
+        echo -e "${RED}User '${USER}' is not in the expected list."
 	      read -p "Delete user? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || continue
 	      ./deleteuser.sh "${USER}"
     fi
@@ -42,7 +42,7 @@ for USER in "${ALL_USERS[@]}"; do
     if [[ ${ADMIN_USERS[@]} =~ $USER ]]
     then
         if groups "$USER" | grep -q '\bsudo\b'; then
-            echo "User '${USER}' has admin privileges, which should be correct."
+            echo -e "${GREEN}User '${USER}' has admin privileges, which should be correct.${NC}"
         else
       	    read -p "Give admin to ${USER}? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || continue
             sudo adduser $USER sudo
@@ -54,7 +54,7 @@ for USER in "${ALL_USERS[@]}"; do
             sudo deluser $USER sudo
             echo "Removed admin from '$USER'"
         else
-      	    echo "User '${USER}' does not have admin privileges, which should be correct."
+      	    echo -e "${GREEN}User '${USER}' does not have admin privileges, which should be correct.${NC}"
         fi
     fi
 done
