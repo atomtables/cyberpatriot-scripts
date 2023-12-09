@@ -32,7 +32,7 @@ ALL_USERS=($(cat /etc/passwd | grep '/home' | cut -d: -f1))
 for USER in "${ALL_USERS[@]}"; do
     if [[ ! " ${EXPECTED_USERS[@]} " =~ " ${USER} " ]]; then
         echo "User '${USER}' is not in the expected list."
-	      read -p "Delete user? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || none
+	      read -p "Delete user? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || continue
 	      ./deleteuser.sh "${USER}"
     fi
 done
@@ -42,10 +42,20 @@ for USER in "${ALL_USERS[@]}"; do
     deluser $USER admin
     if [[ ${ADMIN_USERS[@]} =~ $USER ]]
     then
-        sudo adduser $USER sudo
-        echo "Gave admin to '$USER'"
+        if groups "$USER" | grep -q '\bsudo\b'; then
+            echo "User '${USER}' has admin privileges, which should be correct."
+        else
+      	    read -p "Give admin to ${USER}? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || continue
+            sudo adduser $USER sudo
+            echo "Gave admin to '$USER'"
+        fi
     else
-        sudo deluser $USER sudo
-        echo "Removed admin from '$USER'"
+        if groups "$USER" | grep -q '\bsudo\b'; then
+            read -p "Remove admin from ${USER}? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || continue
+            sudo deluser $USER sudo
+            echo "Removed admin from '$USER'"
+        else
+      	    echo "User '${USER}' does not have admin privileges, which should be correct."
+        fi
     fi
 done
