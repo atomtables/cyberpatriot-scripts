@@ -30,7 +30,8 @@ read new_password
 
 # Change passwords for all users
 for user in "${ALL_USERS[@]}"; do
-    echo "$user:$new_password" | chpasswd
+    echo -e "${BLUE}Changing password for ${user}...${NC}"
+    echo "$user:$new_password" | sudo chpasswd
 done
 
 echo "Passwords changed for all users except $current_user."
