@@ -30,7 +30,6 @@ read new_password
 
 # Change passwords for all users
 for user in "${ALL_USERS[@]}"; do
-    echo -e "${YELLOW}Changing password for ${user}..."
     echo "$user:$new_password" | chpasswd
 done
 
