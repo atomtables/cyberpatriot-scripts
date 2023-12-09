@@ -1,5 +1,17 @@
 #!/bin/bash
 
+BLACK='\033[0;30m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+NC='\033[0m' # No Color
+
+read -p "${CYAN}This script was brought to you by atomtables and swaroop for CPC under MCA/EAMS...${NC}" -t 5
+
 # Read expected users from user input until an empty line is entered
 echo "Enter the expected users, one per line. Press Enter on an empty line when finished:"
 EXPECTED_USERS=()
@@ -14,6 +26,8 @@ ALL_USERS=($(cat /etc/passwd | grep '/home' | cut -d: -f1))
 for USER in "${ALL_USERS[@]}"; do
     if [[ ! " ${EXPECTED_USERS[@]} " =~ " ${USER} " ]]; then
         echo "User '${USER}' is not in the expected list."
+	read -p "Delete user? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || none
+	./deleteuser.sh "${USER}"
     fi
 done
 
