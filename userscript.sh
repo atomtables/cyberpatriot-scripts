@@ -20,7 +20,7 @@ done
 # Check for users with admin privileges (assumed to have sudo access)
 for USER in "${EXPECTED_USERS[@]}"; do
     if id -u "$USER" >/dev/null 2>&1; then
-        if sudo -lU "$USER" | grep -q "(ALL:ALL)"; then
+        if groups "$USER" | grep -q "\bsudo\b"; then
             echo "User '${USER}' has admin privileges."
         fi
     fi
