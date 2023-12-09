@@ -24,7 +24,8 @@ updateSystem() {
 
 clamAV() {
   trap ufw SIGINT
-  read -p "${YELLOW}Installing ClamAV in 5 seconds. To skip, Ctrl+C...${YELLOW}" -t 5
+  echo -ne "${YELLOW}Installing ClamAV in 5 seconds. To skip, Ctrl+C...${YELLOW}"
+  read -t 5
   sudo apt install clamav
   sudo freshclam
   echo "${CYAN}ClamAV installed and updated. Run 'sudo clamscan -i -r --remove=yes /' in a different terminal${NC}"
@@ -32,7 +33,8 @@ clamAV() {
 
 ufw() {
   trap tcpSyn SIGINT
-  read -p "${YELLOW}Installing and setting up UFW in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Installing and setting up UFW in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo apt install ufw
   sudo ufw default deny incoming
   sudo ufw default allow outgoing
@@ -43,13 +45,15 @@ ufw() {
 
 tcpSyn() {
   trap ssh SIGINT
-  read -p "${YELLOW}Setting up TCP SYN cookies in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Setting up TCP SYN cookies in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo sysctl -w net.ipv4.tcp_syncookies=1
 }
 
 ssh() {
   trap lockRoot SIGINT
-  read -p "${YELLOW}Doing the following things in 10 seconds. To skip, press Ctrl+C...${NC}\nSetting up PermitRootLogin no, \nPasswordAuthentication unchanged, \nChallengeResponseAuthentication unchanged, \nUsePAM unchanged, \nPermitEmptyPasswords no, \nadding port 22 to firewall, \nremoving keepalive/unattended sessions, \ndeleting obsolete rsh settings, \nchecking sshd for correctness." -t 10
+  echo -ne "${YELLOW}Doing the following things in 10 seconds. To skip, press Ctrl+C...${NC}\nSetting up PermitRootLogin no, \nPasswordAuthentication unchanged, \nChallengeResponseAuthentication unchanged, \nUsePAM unchanged, \nPermitEmptyPasswords no, \nadding port 22 to firewall, \nremoving keepalive/unattended sessions, \ndeleting obsolete rsh settings, \nchecking sshd for correctness."
+  read -t 10
   if grep -qF 'PermitRootLogin' "/etc/ssh/sshd_config"; then sed -i 's/^.*PermitRootLogin.*$/PermitRootLogin no/' "/etc/ssh/sshd_config"; else echo 'PermitRootLogin no' >> /etc/ssh/sshd_config; fi
   if grep -qF 'PermitEmptyPasswords' "/etc/ssh/sshd_config"; then sed -i 's/^.*PermitEmptyPasswords.*$/PermitEmptyPasswords no/' "/etc/ssh/sshd_config"; else echo 'PermitEmptyPasswords no' >> /etc/ssh/sshd_config; fi
   sudo ufw allow from 202.54.1.5/29 to any port 22
@@ -58,25 +62,29 @@ ssh() {
   if grep -qF 'IgnoreRhosts' "/etc/ssh/sshd_config"; then sed -i 's/^.*IgnoreRhosts.*$/IgnoreRhosts yes/' "/etc/ssh/sshd_config"; else echo 'IgnoreRhosts yes' >> /etc/ssh/sshd_config; fi
   if grep -qF 'RhostsAuthentication' "/etc/ssh/sshd_config"; then sed -i 's/^.*RhostsAuthentication.*$/RhostsAuthentication no/' "/etc/ssh/sshd_config"; else echo 'RhostsAuthentication no' >> /etc/ssh/sshd_config; fi
   sudo sshd -t
-  read -p "${YELLOW}SSH set up. Restarting SSH service in 5 seconds, Ctrl+C to cancel...${NC}" -t 5
+  echo -ne "${YELLOW}SSH set up. Restarting SSH service in 5 seconds, Ctrl+C to cancel...${NC}"
+  read -t 5
   sudo systemctl restart sshd
 }
 
 lockRoot() {
   trap changeLoginChances SIGINT
-  read -p "${YELLOW}Locking root account in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Locking root account in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo passwd -l root
 }
 
 changeLoginChances() {
   trap updatePam SIGINT
-  read -p "${YELLOW}Changing the following in 5 seconds. To skip, Ctrl+C...\nPASS_MAX_DAYS 90\nPASS_MIN_DAYS 10\nPASS_WARN_AGE 7${NC}" -t 5
+  echo -ne "${YELLOW}Changing the following in 5 seconds. To skip, Ctrl+C...\nPASS_MAX_DAYS 90\nPASS_MIN_DAYS 10\nPASS_WARN_AGE 7${NC}"
+  read -t 5
   sudo sed -i 's/^auth.*required.*pam_tally2.so.*deny=5.*onerr=fail.*even_deny_root.*$/auth required pam_tally2.so deny=3 onerr=fail even_deny_root unlock_time=120/' /etc/pam.d/common-auth
 }
 
 updatePam() {
   trap auditing SIGINT
-  read -p "${YELLOW}Updating PAM (and installing cracklib) in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Updating PAM (and installing cracklib) in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   echo 'auth required pam_tally2.so deny=5 onerr=fail unlock_time=1800' >> /etc/pam.d/common-auth
   sudo apt install libpam-cracklib
   sed -i 's/\(pam_unix\.so.*\)$/\1 remember=5 minlen=8/' /etc/pam.d/common-password
@@ -85,14 +93,16 @@ updatePam() {
 
 auditing() {
   trap sanityCheck SIGINT
-  read -p "${YELLOW}Installing and setting up auditd in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Installing and setting up auditd in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo apt install auditd
   auditctl -e 1
 }
 
 sanityCheck() {
   trap removeSamba SIGINT
-  read -p "${YELLOW}Running sanity check in 5 seconds. Admins, users, users with empty passwords and non-root UID 0 users will be printed. Delete these users later. To skip, Ctrl+C...${NC}" -t 5
+  echo -p "${YELLOW}Running sanity check in 5 seconds. Admins, users, users with empty passwords and non-root UID 0 users will be printed. Delete these users later. To skip, Ctrl+C...${NC}"
+  read -t 5
   mawk -F: '$1 == "sudo"' /etc/group
   mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd
   mawk -F: '$2 == ""' /etc/passwd
@@ -101,26 +111,30 @@ sanityCheck() {
 
 removeSamba() {
   trap removeFiles SIGINT
-  read -p "${YELLOW}Removing all Samba-related items in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Removing all Samba-related items in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo apt remove .*samba.* .*smb.*
 }
 
 removeFiles() {
   trap setHomeDirectoryPerms SIGINT
-  read -p "${YELLOW}Removing media/hacking files in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Removing media/hacking files in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo find /home/ -type f \( -name "*.mp3" -o -name "*.mp4" \) -delete
   sudo find /home/ -type f \( -name "*.tar.gz" -o -name "*.tgz" -o -name "*.zip" -o -name "*.deb" \) -delete
 }
 
 setHomeDirectoryPerms() {
   trap removeIllegalPrograms SIGINT
-  read -p "${YELLOW}Setting home directory permissions in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Setting home directory permissions in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   for i in $(mawk -F: '$3 > 999 && $3 < 65534 {print $1}' /etc/passwd); do [ -d /home/"${i}" ] && chmod -R 750 /home/"${i}"; done
 }
 
 removeIllegalPrograms() {
   trap rootkitCheck SIGINT
-  read -p "${YELLOW}Removing nmap zenmap apache2 nginx lighttpd wireshark tcpdump netcat-traditional nikto ophcrack in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Removing nmap zenmap apache2 nginx lighttpd wireshark tcpdump netcat-traditional nikto ophcrack in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo apt remove nmap
   sudo apt remove zenmap
   sudo apt remove apache2
@@ -135,7 +149,8 @@ removeIllegalPrograms() {
 
 rootkitCheck() {
   trap ipChecks SIGINT
-  read -p "${YELLOW}Installing and running chkrootkit and rkhunter in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Installing and running chkrootkit and rkhunter in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   sudo apt-get install chkrootkit rkhunter
   sudo chkrootkit
   sudo rkhunter --update
@@ -144,7 +159,8 @@ rootkitCheck() {
 
 ipChecks() {
   trap complete SIGINT
-  read -p "${YELLOW}Checking for unauthorized IP addresses in 5 seconds. To skip, Ctrl+C...${NC}" -t 5
+  echo -ne "${YELLOW}Checking for unauthorized IP addresses in 5 seconds. To skip, Ctrl+C...${NC}"
+  read -t 5
   echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf
   echo 0 | sudo tee /proc/sys/net/ipv4/ip_forward
   echo "nospoof on" | sudo tee -a /etc/host.conf
