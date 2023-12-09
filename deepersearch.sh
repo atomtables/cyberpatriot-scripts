@@ -16,18 +16,18 @@ read -t 5
 echo -e "Listing all media files:\n"
 
 echo -e "${CYAN}Image files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(jpg|jpeg|png|tiff|bmp|gif)$'
+find /home -type f -regextype egrep -regex '.*\.(jpg|jpeg|png|tiff|bmp|gif)$'
 echo -e "${MAGENTA}Audio files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(mp3|wav|ogg|flac)$'
+find /home -type f -regextype egrep -regex '.*\.(mp3|wav|ogg|flac)$'
 echo -e "${BLUE}Video files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(mp4|mov|mkv)'
+find /home -type f -regextype egrep -regex '.*\.(mp4|mov|mkv)'
 echo -e "${YELLOW}Document files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(txt|docx|doc|xlsx|csv|pptx)'
+find /home -type f -regextype egrep -regex '.*\.(txt|docx|doc|xlsx|csv|pptx)'
 echo -e "${GREEN}Adobe files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(psd|pdf)'
+find /home -type f -regextype egrep -regex '.*\.(psd|pdf)'
 echo -e "${RED}Extractables files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(zip|rar|7z|tar|tar.gz|tar.xz)'
+find /home -type f -regextype egrep -regex '.*\.(zip|rar|7z|tar|tar.gz|tar.xz)'
 echo -e "${WHITE}Executable files:"
-find /Users/atomtables/Downloads -type f -regextype egrep -regex '.*\.(sh|bash|deb|rpm|appimage)'
+find /home -type f -regextype egrep -regex '.*\.(sh|bash|deb|rpm|appimage)'
 
 
