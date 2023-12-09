@@ -21,7 +21,10 @@ done
 for USER in "${EXPECTED_USERS[@]}"; do
     if id -u "$USER" >/dev/null 2>&1; then
         if groups "$USER" | grep -q "\bsudo\b"; then
-            echo "User '${USER}' has admin privileges."
+            echo "User '${USER}' has admin privileges. (under the sudo group)"
         fi
+	if groups "$USER" | grep -q "\bwheel\b"; then
+	    echo "User '${USER}' has admin privileges. (under the wheel group)"
+	fi
     fi
 done
