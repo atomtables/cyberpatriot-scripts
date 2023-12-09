@@ -10,8 +10,8 @@ CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
 
-read -p "${CYAN}This script was brought to you by atomtables and swaroop for CPC under MCA/EAMS...${NC}" -t 5
-
+echo -e "${CYAN}This script was brought to you by atomtables and swaroop for CPC under MCA/EAMS...${NC}"
+read -t 5
 if [[ -z "$1" ]]; then
     echo "Please enter a real username to remove admin from"
     exit

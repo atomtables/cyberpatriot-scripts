@@ -16,8 +16,11 @@ read -t 5
 # update system and packages
 updateSystem() {
   trap 'return' SIGINT
-  echo -e "${YELLOW}Updating system in 5 seconds. To skip, Ctrl+C...${NC}"
+  echo -e "${YELLOW}Updating system and fixing /etc/shadow and disabling avahi-daemon and disabling guest account in 5 seconds. To skip, Ctrl+C...${NC}"
   read -t 5
+  chmod 640 /etc/shadow
+  systemctl disable avahi-daemon
+  echo "allow-guest=false" >> /etc/lightdm/lightdm.conf
   sudo apt update
   sudo apt upgrade
 }
@@ -69,16 +72,18 @@ ssh() {
 
 lockRoot() {
   trap 'return' SIGINT
-  echo -e "${YELLOW}Locking root account in 5 seconds. To skip, Ctrl+C...${NC}"
+  echo -e "${YELLOW}Locking/securing root/sudo account in 5 seconds. To skip, Ctrl+C...${NC}"
   read -t 5
   sudo passwd -l root
+  sed -i 's/!authenticate/authenticate/' /etc/sudoers
 }
 
 changeLoginChances() {
   trap 'return' SIGINT
-  echo -e "${YELLOW}Changing the following in 5 seconds. To skip, Ctrl+C...\nPASS_MAX_DAYS 90\nPASS_MIN_DAYS 10\nPASS_WARN_AGE 7${NC}"
+  echo -e "${YELLOW}Changing the following in 5 seconds. To skip, Ctrl+C...\nPASS_MAX_DAYS 90\nPASS_MIN_DAYS 10\nPASS_WARN_AGE 7\nauth required pam_tally2.so deny=3 onerr=fail even_deny_root unlock_time=120${NC}"
   read -t 5
   sudo sed -i 's/^auth.*required.*pam_tally2.so.*deny=5.*onerr=fail.*even_deny_root.*$/auth required pam_tally2.so deny=3 onerr=fail even_deny_root unlock_time=120/' /etc/pam.d/common-auth
+  sudo sed -i 's/PASS_MAX_DAYS.*$/PASS_MAX_DAYS 90/;s/PASS_MIN_DAYS.*$/PASS_MIN_DAYS 10/;s/PASS_WARN_AGE.*$/PASS_WARN_AGE 7/' /etc/login.defs
 }
 
 updatePam() {
@@ -159,15 +164,16 @@ rootkitCheck() {
 
 ipChecks() {
   trap 'return' SIGINT
-  echo -e "${YELLOW}Checking for unauthorized IP addresses in 5 seconds. To skip, Ctrl+C...${NC}"
+  echo -e "${YELLOW}Changing IP settings in 5 seconds. To skip, Ctrl+C...${NC}"
   read -t 5
   echo "net.ipv6.conf.all.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf
   echo 0 | sudo tee /proc/sys/net/ipv4/ip_forward
   echo "nospoof on" | sudo tee -a /etc/host.conf
+  sed -i 's/net\.ipv4\.ip_forward=1/net\.ipv4\.ip_forward=0/' /etc/sysctl.conf 
 }
 
 complete() {
-  echo -e "${GREEN}CyberPatriot script complete!${NC}"
+  echo -e "\n${GREEN}CyberPatriot script complete!${NC}"
   echo -e "${YELLOW}There are a bunch of things you need to do manually, such as:${NC}"
   echo -e "${MAGENTA}1. Delete users with UID 0 that aren't root"
   echo -e "2. Change users with empty passwords"
