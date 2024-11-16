@@ -208,7 +208,7 @@ tcpSyn
 ssh
 lockRoot
 changeLoginChances
-updatePam
+
 auditing
 sanityCheck
 removeSamba
