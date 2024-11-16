@@ -24,7 +24,7 @@ is_installed() {
 perform_action() {
     local action="$1"
     local package="$2"
-    sudo apt-get "$action" "${package}*" -y &> /dev/null
+    sudo apt-get "$action" "${package}*" &> /dev/null
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}${action^}d package ${package}!${NC}"
     else
