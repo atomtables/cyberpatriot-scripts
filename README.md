@@ -9,4 +9,4 @@ like TCP SYNcookies, and other documented vulnerabilities and modifications
 that people have made over time. These scripts will probably be updated, as
 more of these competitions occur.
 
-This code was arranged by atomtables, and verified by swaroop.
+This code was arranged by atomtables and swaroop.
