@@ -64,6 +64,7 @@ Auth:
     sufficient pam_faillock.so authsucc
 """
     e.write(contents)
+    e.close()
 
 with open('/usr/share/pam-configs/faillock_notify', 'w+') as e:
     contents = """
@@ -75,3 +76,4 @@ Auth:
     requisite pam_faillock.so preauth
 """
     e.write(contents)
+    e.close()
