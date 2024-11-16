@@ -43,8 +43,35 @@ with open("/etc/pam.d/common-password", 'r+') as e:
     unix = re.search(r'(pam_unix\.so.*\n)', contents).group(0)
     contents = re.sub(r"(pam_unix\.so.*\n)", f"{unix} remember=5 minlen=10", contents)
 
+    print("Adding cracklib... Please ensure that cracklib installs correctly.")
+    os.system("sudo apt install -y libpam-cracklib")
+    if input("Did cracklib install? (Y/n)").lower() == 'y':
+        
     e.seek(0)
     e.write(contents)
     e.close()
 
 
+print("Adding a faillock cuz i hate myself...")
+with open('/usr/share/pam-configs/faillock', 'w+') as e:
+    contents = """
+Name: Enforce failed login attempt counter
+Default: no
+Priority: 0
+Auth-Type: Primary
+Auth:
+    [default=die] pam_faillock.so authfail
+    sufficient pam_faillock.so authsucc
+"""
+    e.write(contents)
+
+with open('/usr/share/pam-configs/faillock_notify', 'w+') as e:
+    contents = """
+Name: Notify on failed login attempts
+Default: no
+Priority: 1024
+Auth-Type: Primary
+Auth:
+    requisite pam_faillock.so preauth
+"""
+    e.write(contents)
